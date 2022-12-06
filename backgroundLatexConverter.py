@@ -17,8 +17,14 @@ while True:
         time.sleep(1)
 
     # Open the file and read its contents
-    with open(file_path, "r") as f:
-        content = f.read()
+    try:
+        with open(file_path, "r") as f:
+            content = f.read()
+    except IOError:
+        # If there is an error reading the file, print an error message and continue
+        # to the next iteration of the loop
+        print(f"Could not read file {file_path}. Skipping.")
+        continue
 
     # Wrap the file contents in LaTeX boilerplate
     # f-strings are used to insert the contents of the "content" variable into the string
@@ -35,4 +41,13 @@ while True:
         f.write(latex)
 
     # Convert the LaTeX file to a PDF using pdflatex
-    os.system(f"pdflatex {file_name}.tex")
+    try:
+        os.system(f"pdflatex {file_name}.tex")
+    except OSError:
+        # If there is an error running pdflatex, print an error message and continue
+        # to the next iteration of the loop
+        print(f"Could not run pdflatex on file {file_name}.tex. Skipping.")
+        continue
+
+    # Delete the LaTeX file after it has been converted to a PDF
+    os.remove(file_name + ".tex")
